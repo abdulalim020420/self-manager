@@ -1,0 +1,7 @@
+package com.alim.selfmanager.common.exception;
+
+public class ScheduleConflictException extends RuntimeException {
+    public ScheduleConflictException(String message) {
+        super(message);
+    }
+}
