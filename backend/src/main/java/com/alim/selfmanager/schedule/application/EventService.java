@@ -4,6 +4,7 @@ package com.alim.selfmanager.schedule.application;
 import com.alim.selfmanager.common.exception.InvalidScheduleException;
 import com.alim.selfmanager.common.exception.ResourceNotFoundException;
 import com.alim.selfmanager.common.exception.ScheduleConflictException;
+import com.alim.selfmanager.common.security.CurrentUserProvider;
 import com.alim.selfmanager.schedule.domain.Event;
 import com.alim.selfmanager.schedule.infrastructure.EventRepository;
 import org.springframework.stereotype.Service;
@@ -15,44 +16,57 @@ import java.util.List;
 public class EventService {
 
     private final EventRepository repository;
+    private final CurrentUserProvider currentUserProvider;
 
-    public EventService(EventRepository repository){
+    public EventService(EventRepository repository, CurrentUserProvider currentUserProvider) {
         this.repository = repository;
+        this.currentUserProvider = currentUserProvider;
     }
 
-    public List<Event> getAll(){
-        return repository.findAll();
+    public List<Event> getAll() {
+        return repository.findByUserId(currentUserProvider.getCurrentUserId());
     }
 
-    public Event getById(Long id){
-        return repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Event not found with id " + id));
+    public Event getById(Long id) {
+        Event event = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found with id " + id));
+        checkOwnership(event);
+        return event;
     }
 
-    public List<Event> getByDate(LocalDate date){
-        return repository.findByDate(date);
+    public List<Event> getByDate(LocalDate date) {
+        return repository.findByUserIdAndDate(currentUserProvider.getCurrentUserId(), date);
     }
 
-    public Event create(Event event){
+    public Event create(Event event) {
+        event.setUserId(currentUserProvider.getCurrentUserId());
         validateTimeRange(event);
         checkForConflicts(event, null);
         return repository.save(event);
     }
 
-    public Event update(Long id, Event updated){
-        if (!repository.existsById(id)) {
-            throw new ResourceNotFoundException("Event not found with id " + id);
-        }
-        validateTimeRange(updated);
+    public Event update(Long id, Event updated) {
+        Event existing = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found with id " + id));
+        checkOwnership(existing);
         updated.setId(id);
+        updated.setUserId(existing.getUserId());
+        validateTimeRange(updated);
         checkForConflicts(updated, id);
         return repository.save(updated);
     }
 
-    public void delete(Long id){
-        if (!repository.existsById(id)) {
-            throw new ResourceNotFoundException("Event not found with id " + id);
-        }
+    public void delete(Long id) {
+        Event existing = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found with id " + id));
+        checkOwnership(existing);
         repository.deleteById(id);
+    }
+
+    private void checkOwnership(Event event) {
+        if (!event.getUserId().equals(currentUserProvider.getCurrentUserId())) {
+            throw new ResourceNotFoundException("Event not found with id " + event.getId());
+        }
     }
 
     private void validateTimeRange(Event event) {
@@ -62,11 +76,9 @@ public class EventService {
     }
 
     private void checkForConflicts(Event event, Long excludeId) {
-        List<Event> sameDate = repository.findByDate(event.getDate());
+        List<Event> sameDate = repository.findByUserIdAndDate(currentUserProvider.getCurrentUserId(), event.getDate());
         for (Event existing : sameDate) {
-            if (existing.getId().equals(excludeId)) {
-                continue; // skip itself when updating
-            }
+            if (existing.getId().equals(excludeId)) continue;
             boolean overlaps = event.getStartTime().isBefore(existing.getEndTime())
                     && existing.getStartTime().isBefore(event.getEndTime());
             if (overlaps) {

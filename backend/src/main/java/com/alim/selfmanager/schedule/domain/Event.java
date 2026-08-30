@@ -31,15 +31,18 @@ public class Event {
     @NotNull(message = "End time is required")
     private LocalTime endTime;
 
+    private Long userId;
+
     public Event(){}
 
-    public Event (Long id, String title, String description, LocalDate date, LocalTime startTime, LocalTime endTime){
+    public Event (Long id, String title, String description, LocalDate date, LocalTime startTime, LocalTime endTime, Long userId){
         this.id = id;
         this.title = title;
         this.description = description;
         this.date = date;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.userId = userId;
     }
 
     public Long getId() {
@@ -89,4 +92,7 @@ public class Event {
     public void setStartTime(LocalTime startTime) {
         this.startTime = startTime;
     }
+
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
 }

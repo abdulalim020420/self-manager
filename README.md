@@ -31,12 +31,11 @@ The project will be developed incrementally, with the architecture evolving as t
 ### Core
 
 * [ ] User authentication
-* [ ] Daily dashboard
-* [ ] Habit tracking
-* [ ] Task management
-* [ ] Goals
-* [ ] Streaks
-* [ ] Mood tracking
+* [ ] Daily dashboard analytics
+* [ ] Recurring activity
+* [ ] Events
+* [ ] Goals/Target
+* [ ] Finance
 * [ ] Journal / notes
 * [ ] Calendar
 
