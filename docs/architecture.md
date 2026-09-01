@@ -101,6 +101,9 @@ Example:
 
 The architecture is currently in the planning stage. Technology choices and component boundaries may change as implementation progresses.
 
+## 6. Enforce Design Principles
+  SOLID, DRY, KISS , YAGNI, etc...
+
 
 ---
 v0.1
