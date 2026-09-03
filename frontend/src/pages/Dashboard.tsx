@@ -46,6 +46,12 @@ export function Dashboard() {
           <p className="text-sm text-slate-500">Recurring activities and events combined</p>
         </div>
         <div className="flex items-center gap-2">
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => e.target.value && setDate(e.target.value)}
+            className="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-100"
+          />
           <button
             onClick={() => setDate((d) => shiftDate(d, -1))}
             className="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-100"

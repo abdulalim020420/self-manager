@@ -23,6 +23,7 @@ export function Events() {
   const [form, setForm] = useState<EventInput>(emptyForm)
   const [saving, setSaving] = useState(false)
   const [pendingDeleteId, setPendingDeleteId] = useState<number | null>(null)
+  const [filterDate, setFilterDate] = useState('')
 
   const load = () => {
     setLoading(true)
@@ -93,7 +94,9 @@ export function Events() {
     }
   }
 
-  const sorted = [...events].sort((a, b) => a.date.localeCompare(b.date) || a.startTime.localeCompare(b.startTime))
+  const sorted = [...events]
+    .filter((event) => !filterDate || event.date === filterDate)
+    .sort((a, b) => a.date.localeCompare(b.date) || a.startTime.localeCompare(b.startTime))
 
   return (
     <div>
@@ -105,6 +108,24 @@ export function Events() {
         >
           Add event
         </button>
+      </div>
+
+      <div className="mb-4 flex items-center gap-2">
+        <label className="text-sm font-medium text-slate-700">Filter by date</label>
+        <input
+          type="date"
+          value={filterDate}
+          onChange={(e) => setFilterDate(e.target.value)}
+          className="rounded-md border border-slate-300 px-3 py-1.5 text-sm focus:border-slate-500 focus:outline-none"
+        />
+        {filterDate && (
+          <button
+            onClick={() => setFilterDate('')}
+            className="text-sm text-slate-500 hover:underline"
+          >
+            Clear
+          </button>
+        )}
       </div>
 
       <ErrorBanner message={!showForm ? error : null} />
@@ -190,7 +211,7 @@ export function Events() {
         {loading ? (
           <Spinner />
         ) : sorted.length === 0 ? (
-          <EmptyState message="No events yet." />
+          <EmptyState message={filterDate ? 'No events on this date.' : 'No events yet.'} />
         ) : (
           <ul className="divide-y divide-slate-100">
             {sorted.map((event) => (

@@ -27,6 +27,7 @@ export function RecurringActivities() {
   const [form, setForm] = useState<RecurringActivityInput>(emptyForm)
   const [saving, setSaving] = useState(false)
   const [pendingDeleteId, setPendingDeleteId] = useState<number | null>(null)
+  const [filterDay, setFilterDay] = useState<(typeof DAYS_OF_WEEK)[number] | ''>('')
 
   const load = () => {
     setLoading(true)
@@ -98,9 +99,9 @@ export function RecurringActivities() {
   }
 
   const dayIndex = (day: string) => DAYS_OF_WEEK.indexOf(day as (typeof DAYS_OF_WEEK)[number])
-  const sorted = [...activities].sort(
-    (a, b) => dayIndex(a.dayOfWeek) - dayIndex(b.dayOfWeek) || a.startTime.localeCompare(b.startTime),
-  )
+  const sorted = [...activities]
+    .filter((activity) => !filterDay || activity.dayOfWeek === filterDay)
+    .sort((a, b) => dayIndex(a.dayOfWeek) - dayIndex(b.dayOfWeek) || a.startTime.localeCompare(b.startTime))
 
   return (
     <div>
@@ -112,6 +113,30 @@ export function RecurringActivities() {
         >
           Add activity
         </button>
+      </div>
+
+      <div className="mb-4 flex items-center gap-2">
+        <label className="text-sm font-medium text-slate-700">Filter by day</label>
+        <select
+          value={filterDay}
+          onChange={(e) => setFilterDay(e.target.value as (typeof DAYS_OF_WEEK)[number] | '')}
+          className="rounded-md border border-slate-300 px-3 py-1.5 text-sm focus:border-slate-500 focus:outline-none"
+        >
+          <option value="">All days</option>
+          {DAYS_OF_WEEK.map((day) => (
+            <option key={day} value={day}>
+              {dayLabel(day)}
+            </option>
+          ))}
+        </select>
+        {filterDay && (
+          <button
+            onClick={() => setFilterDay('')}
+            className="text-sm text-slate-500 hover:underline"
+          >
+            Clear
+          </button>
+        )}
       </div>
 
       <ErrorBanner message={!showForm ? error : null} />
@@ -203,7 +228,9 @@ export function RecurringActivities() {
         {loading ? (
           <Spinner />
         ) : sorted.length === 0 ? (
-          <EmptyState message="No recurring activities yet." />
+          <EmptyState
+            message={filterDay ? 'No recurring activities on this day.' : 'No recurring activities yet.'}
+          />
         ) : (
           <ul className="divide-y divide-slate-100">
             {sorted.map((activity) => (
