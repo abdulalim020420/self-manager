@@ -30,14 +30,14 @@ The project will be developed incrementally, with the architecture evolving as t
 
 ### Core
 
-* [ ] User authentication
+* [x] User authentication
 * [ ] Daily dashboard analytics
-* [ ] Recurring activity
-* [ ] Events
+* [x] Recurring activity
+* [x] Events
 * [ ] Goals/Target
 * [ ] Finance
 * [ ] Journal / notes
-* [ ] Calendar
+* [x] Calendar
 
 ### Media
 
@@ -166,8 +166,8 @@ The structure may change as the architecture develops.
 
 | Area             | Technology            |
 | ---------------- | --------------------- |
-| Frontend         | TBD                   |
-| Backend          | TBD                   |
+| Frontend         | React (Vite + TypeScript), Tailwind CSS |
+| Backend          | Spring Boot            |
 | Database         | PostgreSQL            |
 | Cache            | Redis                 |
 | Containerization | Docker                |
@@ -232,10 +232,10 @@ The project will prioritize:
 ## Roadmap
 
 ```text
-[ ] Project foundation
-[ ] Development environment / Docker
-[ ] Authentication
-[ ] Core tracker
+[x] Project foundation
+[x] Development environment / Docker
+[x] Authentication
+[~] Core tracker (schedule: events + recurring activities + calendar)
 [ ] Initial deployment
 [ ] Production hardening
 [ ] Real-time features
